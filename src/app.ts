@@ -75,7 +75,7 @@ const validate = (validatableInput: Validatable) => {
     typeof validatableInput.value === 'string'
   ) {
     isValid =
-      isValid && validatableInput.value.length > validatableInput.minLength;
+      isValid && validatableInput.value.length >= validatableInput.minLength;
   }
 
   if (
@@ -83,21 +83,21 @@ const validate = (validatableInput: Validatable) => {
     typeof validatableInput.value === 'string'
   ) {
     isValid =
-      isValid && validatableInput.value.length < validatableInput.maxLength;
+      isValid && validatableInput.value.length <= validatableInput.maxLength;
   }
 
   if (
     validatableInput.min != null &&
     typeof validatableInput.value === 'number'
   ) {
-    isValid = isValid && validatableInput.value > validatableInput.min;
+    isValid = isValid && validatableInput.value >= validatableInput.min;
   }
 
   if (
     validatableInput.max != null &&
     typeof validatableInput.value === 'number'
   ) {
-    isValid = isValid && validatableInput.value < validatableInput.max;
+    isValid = isValid && validatableInput.value <= validatableInput.max;
   }
 
   return isValid;
@@ -156,6 +156,34 @@ abstract class Component<T extends HTMLElement, U extends HTMLElement> {
   abstract renderContent(): void;
 }
 
+class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
+  private project: Project;
+
+  get persons() {
+    return this.project.people === 1
+      ? '1 person'
+      : `${this.project.people} persons`;
+  }
+
+  constructor(hostId: string, project: Project) {
+    super('single-project', hostId, false, project.id);
+    this.project = project;
+
+    this.configure();
+    this.renderContent();
+  }
+
+  configure() {
+    return;
+  }
+
+  renderContent() {
+    this.element.querySelector('h2')!.textContent = this.project.title;
+    this.element.querySelector('h3')!.textContent = this.persons + ' assigned';
+    this.element.querySelector('p')!.textContent = this.project.description;
+  }
+}
+
 class ProjectList extends Component<HTMLDivElement, HTMLElement> {
   assignedProjects: Project[];
 
@@ -193,10 +221,12 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
 
     listEl.innerHTML = '';
 
-    for (const prjItem of this.assignedProjects) {
-      const listItem = document.createElement('li');
-      listItem.textContent = prjItem.title;
-      listEl.appendChild(listItem);
+    for (const projectItem of this.assignedProjects) {
+      try {
+        new ProjectItem(this.element.querySelector('ul')!.id, projectItem);
+      } catch (error) {
+        console.log(error);
+      }
     }
   }
 }
@@ -227,7 +257,9 @@ class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
     this.element.addEventListener('submit', this.submitHandler);
   }
 
-  renderContent() {}
+  renderContent() {
+    return;
+  }
 
   private clearInputs() {
     this.titleInputElement.value = '';
