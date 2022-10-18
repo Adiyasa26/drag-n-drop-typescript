@@ -12,7 +12,7 @@ export class ProjectList
   assignedProjects: Project[];
 
   constructor(private type: 'active' | 'finished') {
-    super('project-list', 'app', false, `${type}-projects`);
+    super('project-list', 'project-status', false, `${type}-projects`);
     this.assignedProjects = [];
 
     this.configure();
@@ -21,6 +21,9 @@ export class ProjectList
 
   @autobind
   dropHandler(event: DragEvent) {
+    const listElement = this.element.querySelector('ul')!;
+    listElement.classList.remove('droppable');
+
     const projectId = event.dataTransfer!.getData('text/plain');
     projectState.moveProject(
       projectId,
