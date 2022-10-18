@@ -6,7 +6,7 @@ module.exports = {
   output: {
     filename: 'app-bundle.js',
     path: path.resolve(__dirname, 'dist'),
-    publicPath: 'dist',
+    publicPath: '/dist',
   },
   devtool: 'inline-source-map',
   module: {
@@ -20,5 +20,8 @@ module.exports = {
   },
   resolve: {
     extensions: ['.ts', '.js'],
+  },
+  devServer: {
+    static: './',
   },
 };
